@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import checkAuth from '../data/checkAuth';
 import { useNavigate } from 'react-router';
-import { setCookie, getCookie, deleteCookie } from '../utils/cookieUtils';
+import { setCookie, getCookie, deleteCookie, clearWorkoutCookies } from '../utils/cookieUtils';
 
 function ExercisingPlan() {
   const navigate = useNavigate();
@@ -62,14 +62,7 @@ function ExercisingPlan() {
       const userId = getCookie('userId');
       // console.log(userId, exerciseId);
       // Clear all workout-related cookies but preserve user session
-      const allCookies = document.cookie.split(';');
-      allCookies.forEach(cookie => {
-        const eqPos = cookie.indexOf('=');
-        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-        if (name.startsWith('workout_session_') || name === 'deleteId') {
-          deleteCookie(name);
-        }
-      });
+      clearWorkoutCookies();
       setCookie('exerciseId', exerciseId);
       setCookie('userId', userId);
       const res = await fetch(`${BACKEND_URL}/plans/${exerciseId}`);
