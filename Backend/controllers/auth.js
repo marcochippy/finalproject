@@ -4,13 +4,13 @@ import * as bcrypt from 'bcrypt';
 import User from '../models/User.js';
 
 // This will come from the .env file
-const secret = process.env.JWT_SECRET; 
+const secret = process.env.JWT_SECRET;
 const tokenOptions = { expiresIn: '7d' }; // limit the duration
 
 const isProduction = process.env.NODE_ENV === 'production';
 
 const cookieOptions = {
-  httpOnly: true,
+  httpOnly: false,
   sameSite: isProduction ? 'None' : 'Lax',
   secure: isProduction
 };
@@ -36,22 +36,22 @@ const signup = async (req, res) => {
 
 const signin = async (req, res) => {
   const { email, password } = req.body;
- 
+
   const user = await User.findOne({ email }).select('+password');
- 
+
   if (!user) throw new Error('User not found', { cause: 404 });
 
   const passwordMatch = await bcrypt.compare(password, user.password);
 
   if (!passwordMatch) throw new Error('Invalid email or password', { cause: 401 });
 
-  const payload = { userId: user._id};
+  const payload = { userId: user._id };
 
   const token = jwt.sign(payload, secret, tokenOptions);
 
   res.cookie('token', token, cookieOptions);
 
-  res.status(201).json({  userId: user._id,message : 'Welcome Back'});
+  res.status(201).json({ userId: user._id, message: 'Welcome Back' });
 };
 
 const me = async (req, res) => {
