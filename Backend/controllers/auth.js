@@ -10,9 +10,11 @@ const tokenOptions = { expiresIn: '7d' }; // limit the duration
 const isProduction = process.env.NODE_ENV === 'production';
 
 const cookieOptions = {
-  httpOnly: false,
+  httpOnly: true,
   sameSite: isProduction ? 'None' : 'Lax',
-  secure: isProduction
+  secure: isProduction,
+  path: '/',
+  maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days to match JWT expiration
 };
 
 const signup = async (req, res) => {
