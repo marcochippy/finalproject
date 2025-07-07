@@ -114,7 +114,78 @@ export const getIOSCompatibleStorage = () => {
   }
 };
 
+/**
+ * Prevent PWA links from opening in Safari
+ */
+export const preventPWALinkEscape = () => {
+  if (!isPWA()) return;
+
+  // Override all anchor clicks to prevent Safari opening
+  document.addEventListener(
+    'click',
+    e => {
+      const anchor = e.target.closest('a');
+      if (anchor && anchor.href) {
+        const url = new URL(anchor.href);
+        const currentUrl = new URL(window.location.href);
+
+        // If it's the same domain, prevent default and use history API
+        if (url.origin === currentUrl.origin) {
+          e.preventDefault();
+          window.history.pushState({}, '', anchor.href);
+
+          // Trigger a popstate event to make React Router handle the navigation
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        }
+      }
+    },
+    true
+  );
+
+  // Handle browser back/forward in PWA
+  window.addEventListener('popstate', e => {
+    if (isPWA()) {
+      // Let React Router handle the navigation
+      window.location.href = window.location.href;
+    }
+  });
+};
+
+/**
+ * Fix iOS PWA navigation issues
+ */
+export const fixIOSPWANavigation = () => {
+  if (!isIOS() || !isPWA()) return;
+
+  // Prevent external navigation in PWA
+  preventPWALinkEscape();
+
+  // Override window.open in PWA to stay in app
+  const originalOpen = window.open;
+  window.open = function (url, target, features) {
+    if (isPWA() && target === '_blank') {
+      // Instead of opening in new window, navigate in current window
+      window.location.href = url;
+      return null;
+    }
+    return originalOpen.call(this, url, target, features);
+  };
+
+  // Override location changes to stay in PWA
+  const originalAssign = window.location.assign;
+  window.location.assign = function (url) {
+    if (isPWA()) {
+      window.location.href = url;
+    } else {
+      originalAssign.call(this, url);
+    }
+  };
+};
+
 // Initialize iOS compatibility on load
 if (typeof window !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', setupIOSCompatibility);
+  document.addEventListener('DOMContentLoaded', () => {
+    setupIOSCompatibility();
+    fixIOSPWANavigation();
+  });
 }
