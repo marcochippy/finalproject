@@ -184,8 +184,29 @@ export const fixIOSPWANavigation = () => {
 
 // Initialize iOS compatibility on load
 if (typeof window !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', () => {
-    setupIOSCompatibility();
-    fixIOSPWANavigation();
-  });
+  // Use both DOMContentLoaded and a fallback timeout
+  let initialized = false;
+
+  const initializeOnce = () => {
+    if (initialized) return;
+    initialized = true;
+
+    try {
+      setupIOSCompatibility();
+      fixIOSPWANavigation();
+    } catch (error) {
+      console.warn('iOS compatibility setup failed:', error);
+    }
+  };
+
+  // Primary initialization
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeOnce);
+  } else {
+    // DOM is already ready
+    initializeOnce();
+  }
+
+  // Fallback initialization after a short delay
+  setTimeout(initializeOnce, 100);
 }
