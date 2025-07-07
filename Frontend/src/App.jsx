@@ -17,23 +17,15 @@ function App() {
         <Routes>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Home />} />
-            {/* <Route path="plans" element={<Plans />} /> */}
-            <Route path="plans" element={<ProtectedLayout />}>
-              <Route index element={<Plans />} />
-           </Route>
-            <Route path="createplan" element={<ProtectedLayout />}>
-              <Route index element={<CreatePlan />} />
-            </Route>
-            <Route path="exercisingplan" element={<ProtectedLayout />}>
-              <Route index element={<ExercisingPlan />} />
-            </Route>
-            <Route path="allplans" element={<ProtectedLayout />}>
-              <Route index element={<AllPlans />} />
-            </Route>
+            <Route path="plans" element={<Plans />} />
+
+            <Route path="createplan" element={<CreatePlan />} />
+            <Route path="exercisingplan" element={<ExercisingPlan />} />
+            <Route path="allplans" element={<AllPlans />} />
+
             <Route path="signin" element={<LoginSignup />} />
             <Route path="signup" element={<SignUp />} />
             <Route path="profile" element={<Profile />} />
-           
           </Route>
           {/* <Route path='*' element={<NotFound />} /> */}
         </Routes>
