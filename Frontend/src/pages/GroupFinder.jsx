@@ -318,8 +318,8 @@ const GroupFinder = () => {
         setSelectedActivity(result.activity);
       }
 
-      const statusText = newStatus === 'approved' ? 'approved' : 'declined';
-      alert(`✅ Join request ${statusText} successfully!`);
+      const statusText = newStatus === 'approved' ? 'approved' : 'removed';
+      alert(`✅ ${newStatus === 'approved' ? 'Join request approved' : 'Attendee removed'} successfully!`);
     } catch (error) {
       console.error('Error updating attendee status:', error);
       alert('❌ Failed to update attendee status: ' + error.message);
@@ -485,8 +485,6 @@ const GroupFinder = () => {
                                 return 'opacity-100';
                               case 'pending':
                                 return 'opacity-50';
-                              case 'declined':
-                                return 'opacity-25 grayscale sepia-[0.3] hue-rotate-[320deg] saturate-[1.5]'; // Red-ish tint
                               default:
                                 return 'opacity-100';
                             }
@@ -543,8 +541,6 @@ const GroupFinder = () => {
                                   return 'opacity-100';
                                 case 'pending':
                                   return 'opacity-50';
-                                case 'declined':
-                                  return 'opacity-25 grayscale sepia-[0.3] hue-rotate-[320deg] saturate-[1.5]';
                                 default:
                                   return 'opacity-100';
                               }
@@ -574,15 +570,12 @@ const GroupFinder = () => {
                                           ? 'text-green-400'
                                           : attendee.status === 'pending'
                                           ? 'text-yellow-400'
-                                          : attendee.status === 'declined'
-                                          ? 'text-red-400'
                                           : 'text-gray-400'
                                       }`}
                                     >
                                       {attendee.status}
                                       {attendee.status === 'pending' && ' ⏳'}
                                       {attendee.status === 'approved' && ' ✅'}
-                                      {attendee.status === 'declined' && ' ❌'}
                                     </p>
                                   </div>
                                 </div>
@@ -629,23 +622,6 @@ const GroupFinder = () => {
                                       disabled={isUpdating}
                                     >
                                       Remove
-                                    </button>
-                                  </div>
-                                )}
-
-                                {attendee.status === 'declined' && (
-                                  <div className="flex gap-1">
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        const attendeeUserId =
-                                          typeof attendee.userId === 'object' ? attendee.userId._id : attendee.userId;
-                                        handleUpdateAttendeeStatus(activity._id, attendeeUserId, 'approved');
-                                      }}
-                                      className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
-                                      disabled={isUpdating}
-                                    >
-                                      Re-approve
                                     </button>
                                   </div>
                                 )}
@@ -731,8 +707,6 @@ const GroupFinder = () => {
                             return <p className="text-yellow-400 text-sm italic">Join request pending ⏳</p>;
                           } else if (userStatus === 'approved') {
                             return <p className="text-green-400 text-sm italic">You're joining this! ✅</p>;
-                          } else if (userStatus === 'declined') {
-                            return <p className="text-red-400 text-sm italic">Request declined ❌</p>;
                           }
                           return null;
                         })()}
@@ -749,8 +723,6 @@ const GroupFinder = () => {
                                 return 'opacity-100';
                               case 'pending':
                                 return 'opacity-50';
-                              case 'declined':
-                                return 'opacity-25 grayscale sepia-[0.3] hue-rotate-[320deg] saturate-[1.5]'; // Red-ish tint
                               default:
                                 return 'opacity-100';
                             }
@@ -818,12 +790,6 @@ const GroupFinder = () => {
                               disabled={isJoining}
                             >
                               {isJoining ? 'Leaving...' : 'Leave'}
-                            </button>
-                          );
-                        } else if (userStatus === 'declined') {
-                          return (
-                            <button className="btn bg-gray-600 ml-5 h-8" disabled>
-                              Declined
                             </button>
                           );
                         } else if (canJoin) {
@@ -936,8 +902,7 @@ const GroupFinder = () => {
                   {managingActivity.attendeessLimit}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong>Total Requests:</strong> {managingActivity.attendess?.length || 0} (including
-                  pending/declined)
+                  <strong>Total Requests:</strong> {managingActivity.attendess?.length || 0} (including pending)
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong>Created:</strong> {new Date(managingActivity.createdAt).toLocaleDateString()}
@@ -956,8 +921,6 @@ const GroupFinder = () => {
                             return 'opacity-100';
                           case 'pending':
                             return 'opacity-50';
-                          case 'declined':
-                            return 'opacity-25 grayscale sepia-[0.3] hue-rotate-[320deg] saturate-[1.5]'; // Red-ish tint
                           default:
                             return 'opacity-100';
                         }
@@ -984,15 +947,12 @@ const GroupFinder = () => {
                                     ? 'text-green-600'
                                     : attendee.status === 'pending'
                                     ? 'text-yellow-600'
-                                    : attendee.status === 'declined'
-                                    ? 'text-red-600'
                                     : 'text-gray-600'
                                 }`}
                               >
                                 {attendee.status}
                                 {attendee.status === 'pending' && ' ⏳'}
                                 {attendee.status === 'approved' && ' ✅'}
-                                {attendee.status === 'declined' && ' ❌'}
                               </p>
                             </div>
                           </div>
@@ -1039,23 +999,6 @@ const GroupFinder = () => {
                                 disabled={isUpdating}
                               >
                                 Remove
-                              </button>
-                            </div>
-                          )}
-
-                          {attendee.status === 'declined' && (
-                            <div className="flex gap-1">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const attendeeUserId =
-                                    typeof attendee.userId === 'object' ? attendee.userId._id : attendee.userId;
-                                  handleUpdateAttendeeStatus(managingActivity._id, attendeeUserId, 'approved');
-                                }}
-                                className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
-                                disabled={isUpdating}
-                              >
-                                Re-approve
                               </button>
                             </div>
                           )}
@@ -1164,7 +1107,7 @@ const GroupFinder = () => {
                     {selectedActivity.attendeessLimit || 'No limit'} confirmed
                   </p>
                   <p className="text-gray-300 mb-3 text-sm">
-                    Total requests: {selectedActivity.attendess?.length || 0} (including pending/declined)
+                    Total requests: {selectedActivity.attendess?.length || 0} (including pending)
                   </p>
 
                   {selectedActivity.attendess && selectedActivity.attendess.length > 0 && (
@@ -1178,8 +1121,6 @@ const GroupFinder = () => {
                             ? 'text-green-400'
                             : attendee.status === 'pending'
                             ? 'text-yellow-400'
-                            : attendee.status === 'declined'
-                            ? 'text-red-400'
                             : 'text-gray-400';
 
                         const getAttendeeStyle = status => {
@@ -1188,8 +1129,6 @@ const GroupFinder = () => {
                               return 'opacity-100';
                             case 'pending':
                               return 'opacity-50';
-                            case 'declined':
-                              return 'opacity-25 grayscale sepia-[0.3] hue-rotate-[320deg] saturate-[1.5]'; // Red-ish tint
                             default:
                               return 'opacity-100';
                           }
@@ -1218,7 +1157,6 @@ const GroupFinder = () => {
                                 {attendee.status}
                                 {attendee.status === 'pending' && ' ⏳'}
                                 {attendee.status === 'approved' && ' ✅'}
-                                {attendee.status === 'declined' && ' ❌'}
                               </p>
                             </div>
                           </div>
@@ -1234,7 +1172,6 @@ const GroupFinder = () => {
                       <div className="flex gap-4">
                         <span>✅ Approved: Normal</span>
                         <span>⏳ Pending: 50% opacity</span>
-                        <span>❌ Declined: 25% opacity + red tint</span>
                       </div>
                     </div>
                   )}
@@ -1310,12 +1247,6 @@ const GroupFinder = () => {
                             disabled={isJoining}
                           >
                             {isJoining ? 'Leaving...' : 'Leave Activity'}
-                          </button>
-                        );
-                      } else if (userStatus === 'declined') {
-                        return (
-                          <button className="btn bg-gray-600 text-white px-6 py-2" disabled>
-                            Request Declined
                           </button>
                         );
                       } else if (canJoin) {

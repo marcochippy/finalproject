@@ -241,21 +241,29 @@ const updateAttendeeStatus = async (req, res) => {
   }
 
   // Find the attendee to update
-  const attendee = group.attendess.find(att => att.userId.toString() === attendeeId);
-  if (!attendee) {
+  const attendeeIndex = group.attendess.findIndex(att => att.userId.toString() === attendeeId);
+  if (attendeeIndex === -1) {
     return res.status(404).json({ error: 'Attendee not found in this activity' });
   }
 
-  // Update the status
-  attendee.status = status;
+  // Handle different status updates
+  if (status === 'declined') {
+    // Remove the attendee completely when declined
+    group.attendess.splice(attendeeIndex, 1);
+  } else {
+    // Update status for pending or approved
+    group.attendess[attendeeIndex].status = status;
+  }
 
   await group.save();
 
   // Populate user data before returning
   const populatedGroup = await Lfg.findById(id).populate('userId', 'name').populate('attendess.userId', 'name');
 
+  const message = status === 'declined' ? 'Attendee removed from activity' : `Attendee status updated to ${status}`;
+
   res.json({
-    message: `Attendee status updated to ${status}`,
+    message: message,
     activity: populatedGroup
   });
 };

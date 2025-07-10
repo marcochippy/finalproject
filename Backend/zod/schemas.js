@@ -69,7 +69,7 @@ const logSchema = z.object({
 });
 
 const groupFinderSchema = z.object({
-  userId: z.string().min(1).optional(), // Make userId optional since it comes from auth token
+  userId: z.union([z.string().min(1), z.object({ _id: z.string(), name: z.string() })]).optional(), // Allow both string and populated object
   name: z.string().min(1),
   description: z.string().min(1),
   gym: z.string().min(1),
@@ -79,7 +79,7 @@ const groupFinderSchema = z.object({
   attendeessLimit: z.number().min(1),
   attendess: z.array(
     z.object({
-      userId: z.string().min(1),
+      userId: z.union([z.string().min(1), z.object({ _id: z.string(), name: z.string() })]),
       status: z.string().min(1)
     })
   ),
